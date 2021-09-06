@@ -175,10 +175,13 @@ func enterLobbyEndpoint(w http.ResponseWriter, r *http.Request) {
 // SetUsersessionCookie takes the players usersession and sets it as a cookie.
 func SetUsersessionCookie(w http.ResponseWriter, player *game.Player) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     "usersession",
-		Value:    player.GetUserSession(),
-		Path:     "/",
-		SameSite: http.SameSiteStrictMode,
+		Name:  "usersession",
+		Value: player.GetUserSession(),
+		Path:  "/",
+		// fix iframe / cross-origin issue
+		SameSite: http.SameSiteNoneMode,
+		Secure:   true,
+		Domain:   "scena360.com",
 	})
 }
 
