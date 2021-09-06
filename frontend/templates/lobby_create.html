@@ -15,20 +15,7 @@
     <div class="content-wrapper">
     <noscript><span class="noscript">{{.Translation.Get "requires-js"}}</span></noscript>
 
-    <h1>Scribble.rs</h1>
-
-    <div class="tab-header">
-        <label for="create-lobby-tab-button">
-            <input id="create-lobby-tab-button" class="custom-check-or-radio tab-button"
-                type="radio" onclick="openTab('create-lobby')" name="tab" checked>
-            <div class="tab-label">{{.Translation.Get "create-lobby"}}</div>
-        </label>
-        <label for="join-lobby-tab-button">
-            <input id="join-lobby-tab-button" class="custom-check-or-radio tab-button"
-                type="radio" onclick="openTab('join-lobby')" name="tab">
-            <div class="tab-label">{{.Translation.Get "join-lobby"}}</div>
-        </label>
-    </div>
+    <h1>Scena Scribble</h1>
 
     <div id="create-lobby" class="tab-content">
         <div class="center-container">
@@ -46,7 +33,7 @@
                     </div>
 
                 {{end}}
-                <form id="lobby-create" class="input-container" action="{{.RootPath}}/ssrCreateLobby" method="POST">
+                <form id="lobby-create" class="input-container">
                     <b>{{.Translation.Get "word-language"}}</b>
                     <select class="input-item" name="language" placeholder="Choose your language">
                         {{$language := .Language}}
@@ -63,9 +50,7 @@
                     <b>{{.Translation.Get "max-players-setting"}}</b>
                     <input class="input-item" type="number" name="max_players" min="{{.MinMaxPlayers}}"
                     max="{{.MaxMaxPlayers}}" value="{{.MaxPlayers}}"/>
-                    <b>{{.Translation.Get "public-lobby-setting"}}</b>
-                    <input class="input-item" type="checkbox" name="public" value="true"
-                        {{if eq .Public "true"}}checked{{end}}/>
+               
                     <b>{{.Translation.Get "custom-words"}}</b>
                     <textarea class="input-item" name="custom_words"
                     placeholder="{{.Translation.Get "custom-words-info"}}">{{.CustomWords}}</textarea>
@@ -75,18 +60,8 @@
                         <input style="flex: 1;" type="range" name="custom_words_chance" min="1" max="100" value="{{.CustomWordsChance}}">
                         100%
                     </div>
-                    <details class="advanced-section">
-                        <summary>{{.Translation.Get "advanced-settings"}}</summary>
-                        <div class="input-container">
-                            <b>{{.Translation.Get "players-per-ip-limit-setting"}}</b>
-                            <input class="input-item" type="number" name="clients_per_ip_limit" min="{{.MinClientsPerIPLimit}}"
-                            max="{{.MaxClientsPerIPLimit}}" value="{{.ClientsPerIPLimit}}"/>
-                            <b>{{.Translation.Get "enable-votekick-setting"}}</b>
-                            <input class="input-item" type="checkbox" name="enable_votekick" value="true"
-                            {{if eq .EnableVotekick "true"}}checked{{end}}/>
-                        </div>
-                    </details>
-                    <button type="submit" form="lobby-create" style="grid-column-start: 1; grid-column-end: 3;">
+                 
+                    <button type="submit" id="lobby-create-btn" style="grid-column-start: 1; grid-column-end: 3;">
                             {{.Translation.Get "create-lobby"}}
                     </button>
                 </form>
@@ -134,7 +109,6 @@
         </div>
     </div>
 
-    {{template "footer" .}}
 </div>
 
 <script type="text/javascript">
@@ -153,11 +127,32 @@
     let drawingTimeDetail = document.getElementById("drawing-time-detail");
     let customWordsDetail = document.getElementById("custom-words-detail");
     let votekickingDetail = document.getElementById("votekicking-detail");
-    let maxClientsIPDetail = document.getElementById("max-clients-ip-detail");
 
     function onJoin() {
-        window.open("{{.RootPath}}/ssrEnterLobby?lobby_id=" + selectedLobby, "_self");
+        window.open("{{.RootPath}}/ssrEnterLobby? =" + selectedLobby, "_self");
     }
+
+    const createFormElement = document.getElementById('lobby-create');
+    const createLobbyBtnElement = document.getElementById('lobby-create-btn');
+
+    createFormElement.onsubmit = (e) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const lobbyId = urlParams.get('lobby_id');
+        
+        const data = new URLSearchParams(new FormData(createFormElement));
+        
+        data.append("lobby_id", lobbyId);
+        
+        fetch("{{.RootPath}}/ssrCreateLobby?lobby_id" + lobbyId, {
+            method: "POST",
+            body: data,
+            redirect: 'follow'
+        }).then(resp => {    
+            console.log(resp)        
+            window.open(resp.url, "_self");
+        });
+        e.preventDefault();
+    };
 
     function loadLobbyTable() {
         lobbyTableLoaded = true;
@@ -219,7 +214,6 @@
             drawingTimeDetail.innerText = "";
             customWordsDetail.innerText = "";
             votekickingDetail.innerText = "";
-            maxClientsIPDetail.innerText = "";
             joinButton.disabled = true;
         } else {
             wordpackDetail.innerText = lobby.wordpack;
@@ -228,7 +222,6 @@
             drawingTimeDetail.innerText = lobby.drawingTime.toString();
             customWordsDetail.innerText = lobby.customWords ? '{{.Translation.Get "yes"}}' : '{{.Translation.Get "no"}}';
             votekickingDetail.innerText = lobby.votekick ? '{{.Translation.Get "yes"}}' : '{{.Translation.Get "no"}}';
-            maxClientsIPDetail.innerText = lobby.maxClientsPerIp;
             joinButton.disabled = false;
         }
     }

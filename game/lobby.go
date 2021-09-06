@@ -18,21 +18,18 @@ import (
 	discordemojimap "github.com/Bios-Marcel/discordemojimap/v2"
 	"github.com/agnivade/levenshtein"
 	petname "github.com/dustinkirkland/golang-petname"
-	"github.com/gofrs/uuid"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
 
 var (
 	LobbySettingBounds = &SettingBounds{
-		MinDrawingTime:       60,
-		MaxDrawingTime:       300,
-		MinRounds:            1,
-		MaxRounds:            20,
-		MinMaxPlayers:        2,
-		MaxMaxPlayers:        24,
-		MinClientsPerIPLimit: 1,
-		MaxClientsPerIPLimit: 24,
+		MinDrawingTime: 60,
+		MaxDrawingTime: 300,
+		MinRounds:      1,
+		MaxRounds:      20,
+		MinMaxPlayers:  2,
+		MaxMaxPlayers:  24,
 	}
 	SupportedLanguages = map[string]string{
 		"english_gb": "English (GB)",
@@ -57,14 +54,12 @@ const (
 // SettingBounds defines the lower and upper bounds for the user-specified
 // lobby creation input.
 type SettingBounds struct {
-	MinDrawingTime       int64 `json:"minDrawingTime"`
-	MaxDrawingTime       int64 `json:"maxDrawingTime"`
-	MinRounds            int64 `json:"minRounds"`
-	MaxRounds            int64 `json:"maxRounds"`
-	MinMaxPlayers        int64 `json:"minMaxPlayers"`
-	MaxMaxPlayers        int64 `json:"maxMaxPlayers"`
-	MinClientsPerIPLimit int64 `json:"minClientsPerIpLimit"`
-	MaxClientsPerIPLimit int64 `json:"maxClientsPerIpLimit"`
+	MinDrawingTime int64 `json:"minDrawingTime"`
+	MaxDrawingTime int64 `json:"maxDrawingTime"`
+	MinRounds      int64 `json:"minRounds"`
+	MaxRounds      int64 `json:"maxRounds"`
+	MinMaxPlayers  int64 `json:"minMaxPlayers"`
+	MaxMaxPlayers  int64 `json:"maxMaxPlayers"`
 }
 
 // LineEvent is basically the same as GameEvent, but with a specific Data type.
@@ -893,15 +888,14 @@ func (lobby *Lobby) triggerPlayersUpdate() {
 
 // CreateLobby creates a new lobby including the initial player (owner) and
 // optionally returns an error, if any occurred during creation.
-func CreateLobby(playerName, chosenLanguage string, publicLobby bool, drawingTime, rounds, maxPlayers, customWordsChance, clientsPerIPLimit int, customWords []string, enableVotekick bool) (*Player, *Lobby, error) {
+func CreateLobby(lobbyID string, playerName, chosenLanguage string, publicLobby bool, drawingTime, rounds, maxPlayers, customWordsChance int, customWords []string, enableVotekick bool) (*Player, *Lobby, error) {
 	lobby := &Lobby{
-		LobbyID: uuid.Must(uuid.NewV4()).String(),
+		LobbyID: lobbyID,
 		EditableLobbySettings: &EditableLobbySettings{
 			Rounds:            rounds,
 			DrawingTime:       drawingTime,
 			MaxPlayers:        maxPlayers,
 			CustomWordsChance: customWordsChance,
-			ClientsPerIPLimit: clientsPerIPLimit,
 			EnableVotekick:    enableVotekick,
 			Public:            publicLobby,
 		},

@@ -170,9 +170,6 @@
                                         <input id="lobby-settings-max-players" type="number" name="max_players"
                                             min="{{.MinMaxPlayers}}" max="{{.MaxMaxPlayers}}"
                                             value="{{.MaxPlayers}}" />
-                                        <b>{{.Translation.Get "public-lobby-setting"}}</b>
-                                        <input id="lobby-settings-public" type="checkbox" name="public" {{if eq
-                                            .Public true}}checked{{end}} />
                                         <b>{{.Translation.Get "custom-words-chance-setting"}}</b>
                                         <div style="display: flex;">
                                             0%
@@ -182,20 +179,6 @@
                                             100%
                                         </div>
 
-                                        <details class="advanced-section">
-                                            <summary>{{.Translation.Get "advanced-settings"}}</summary>
-                                            <div class="input-container">
-                                                <b>{{.Translation.Get "players-per-ip-limit-setting"}}</b>
-                                                <input id="lobby-settings-clients-per-ip-limit" type="number"
-                                                    name="clients_per_ip_limit" min="{{.MinClientsPerIPLimit}}"
-                                                    max="{{.MaxClientsPerIPLimit}}"
-                                                    value="{{.ClientsPerIPLimit}}" />
-                                                <b>{{.Translation.Get "enable-votekick-setting"}}</b>
-                                                <input id="lobby-settings-enable-votekick" type="checkbox"
-                                                    name="enable_votekick" {{if eq .EnableVotekick
-                                                    true}}checked{{end}} />
-                                            </div>
-                                        </details>
                                         <button class="dialog-button" onclick="saveLobbySettings()"
                                             style="grid-column-start: 1; grid-column-end: 3;">
                                             {{.Translation.Get "save-settings"}}
@@ -393,7 +376,6 @@
             </div>
         </div>
 
-        {{template "footer" .}}
     </div>
 
     <script type="text/javascript" src="{{.RootPath}}/resources/floodfill.js"></script>

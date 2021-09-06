@@ -1,4 +1,4 @@
-<h1 align="center">Scribble.rs</h1>
+<h1 align="center">Scena Scribble</h1>
 
 <p align="center">
   <a href="https://github.com/scribble-rs/scribble.rs/actions">
