@@ -59,6 +59,11 @@ func publicLobbies(w http.ResponseWriter, r *http.Request) {
 }
 
 func createLobby(w http.ResponseWriter, r *http.Request) {
+	var lobbyID = r.URL.Query().Get("lobby_id")
+	if lobbyID == "" {
+		lobbyID = r.FormValue("lobby_id")
+	}
+
 	formParseError := r.ParseForm()
 	if formParseError != nil {
 		http.Error(w, formParseError.Error(), http.StatusBadRequest)
@@ -107,10 +112,6 @@ func createLobby(w http.ResponseWriter, r *http.Request) {
 
 	var playerName = GetPlayername(r)
 
-	var lobbyID = r.URL.Query().Get("lobby_id")
-	if lobbyID == "" {
-		lobbyID = r.FormValue("lobby_id")
-	}
 	player, lobby, createError := game.CreateLobby(lobbyID, playerName, language, publicLobby, drawingTime, rounds, maxPlayers, customWordChance, customWords, enableVotekick)
 	if createError != nil {
 		http.Error(w, createError.Error(), http.StatusBadRequest)

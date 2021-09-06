@@ -16,6 +16,21 @@ import (
 // homePage servers the default page for scribble.rs, which is the page to
 // create a new lobby.
 func homePage(w http.ResponseWriter, r *http.Request) {
+	var lobbyID = r.URL.Query().Get("lobby_id")
+	if lobbyID == "" {
+		lobbyID = r.FormValue("lobby_id")
+	}
+	fmt.Println("homePage: " + lobbyID)
+
+	lobby := state.GetLobby(lobbyID)
+	if lobby != nil {
+		lobby.WriteJSON = api.WriteJSON
+
+		fmt.Printf("redirect...: %s", currentBasePageConfig.RootPath+"/ssrEnterLobby?lobby_id="+lobbyID)
+		http.Redirect(w, r, currentBasePageConfig.RootPath+"/ssrEnterLobby?lobby_id="+lobbyID, http.StatusTemporaryRedirect)
+		return
+	}
+
 	translation, locale := determineTranslation(r)
 	createPageData := createDefaultLobbyCreatePageData()
 	createPageData.Translation = translation
@@ -63,6 +78,17 @@ type LobbyCreatePageData struct {
 // ssrCreateLobby allows creating a lobby, optionally returning errors that
 // occurred during creation.
 func ssrCreateLobby(w http.ResponseWriter, r *http.Request) {
+	var lobbyID = r.URL.Query().Get("lobby_id")
+	if lobbyID == "" {
+		lobbyID = r.FormValue("lobby_id")
+	}
+
+	lobby := state.GetLobby(lobbyID)
+	if lobby != nil {
+		http.Redirect(w, r, currentBasePageConfig.RootPath+"/ssrEnterLobby?lobby_id="+lobby.LobbyID, http.StatusFound)
+		return
+	}
+
 	formParseError := r.ParseForm()
 	if formParseError != nil {
 		http.Error(w, formParseError.Error(), http.StatusBadRequest)
@@ -133,11 +159,6 @@ func ssrCreateLobby(w http.ResponseWriter, r *http.Request) {
 
 	var playerName = api.GetPlayername(r)
 
-	var lobbyID = r.URL.Query().Get("lobby_id")
-	if lobbyID == "" {
-		lobbyID = r.FormValue("lobby_id")
-	}
-
 	player, lobby, createError := game.CreateLobby(lobbyID, playerName, language, publicLobby, drawingTime, rounds, maxPlayers, customWordChance, customWords, enableVotekick)
 	if createError != nil {
 		pageData.Errors = append(pageData.Errors, createError.Error())
@@ -156,6 +177,5 @@ func ssrCreateLobby(w http.ResponseWriter, r *http.Request) {
 
 	//We only add the lobby if we could do all necessary pre-steps successfully.
 	state.AddLobby(lobby)
-	fmt.Println(currentBasePageConfig.RootPath + "/ssrEnterLobby?lobby_id=" + lobby.LobbyID)
 	http.Redirect(w, r, currentBasePageConfig.RootPath+"/ssrEnterLobby?lobby_id="+lobby.LobbyID, http.StatusFound)
 }
