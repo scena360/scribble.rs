@@ -181,7 +181,6 @@ func SetUsersessionCookie(w http.ResponseWriter, player *game.Player) {
 		// fix iframe / cross-origin issue
 		SameSite: http.SameSiteNoneMode,
 		Secure:   true,
-		Domain:   "scena360.com",
 	})
 }
 
